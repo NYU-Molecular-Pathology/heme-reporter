@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: url("/static/images/blood2.jpeg") no-repeat fixed;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+
+.topnav {
+  overflow: hidden;
+  background-color: #333;
+}
+
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.topnav a.active {
+  background-color: #04AA6D;
+  color: white;
+}
+
+.topnav-right {
+  float: right;
+}
+
+img{
+    width: 40%;
+    height: 30%;
+    }
+
+</style>
+</head>
+<body style="font-family:Arial;margin: 50px;">
+    <center><h1 style="color:purple;">NYU MyeloSEQer</h1></center>
+
+<div class="topnav">
+  <a class="active" href="{% url 'home' %}">Home</a>
+  <!--<a href="{% url 'upload_input_report' %}">Upload</a>-->
+  <div class="topnav-right">
+    <a href="{% url 'register' %}">Register</a>
+    <a href="{% url 'login' %}">Login</a>
+  </div>
+</div>
+
+<div style="padding-left:16px">
+  <h2>Oncomine Myeloid Panel - MyeloSEQer</h2>
+  <h3> Overview of the Assay </h3>
+  <p>The NYU Onconmine Myeloid Assay is a comprehensive, targeted NGS assay using Ion AmpliSeq library Kit and Torrent sequencing platform (ThermoFisherTM). This assay can detect sequence variants in 50 genes (16 full genes and 22 hotspot genes), along with additional coverage of 17 fusion driver genes (Table 1) that have been previously identified as drivers of hematological malignancies.</p>
+
+  <left><img src="{% static 'images/myeloid_genes.png'%}" alt=""></left>
+
+</div>
+
+</body>
+</html>

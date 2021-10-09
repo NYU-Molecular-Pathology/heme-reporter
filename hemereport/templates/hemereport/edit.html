@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+ 
+{% block title %}Add New Records{% endblock title %}
+ 
+{% block content %}
+<div class="col-md-12">
+    <h4>Bootstrap Datatable</h4>  
+ <form method="POST" class="post-form" action="/update/{{allabberations.id}}">  
+   {% csrf_token %}  
+  <div class="container">  
+ <br>  
+  <div class="form-group row">  
+  <label class="col-sm-1 col-form-label"></label>  
+  <div class="col-sm-4">  
+  <h3>Update Details</h3>  
+  </div>  
+   </div>  
+  <div class="form-group row">  
+  <label class="col-sm-2 col-form-label">ID:</label>  
+  <div class="col-sm-4">  
+   <input type="text" class="form-control" name="id" id="id_id" readonly required maxlength="20" value="{{ allabberations.id }}"/>  
+  </div>  
+   </div>  
+   <div class="form-group row">  
+    <label class="col-sm-2 col-form-label">Gene:</label>  
+    <div class="col-sm-4">  
+     <input type="text" class="form-control" name="sample" id="id_sample" required maxlength="255" value="{{ allabberations.sample }}" />  
+    </div>  
+     </div>  
+   <div class="form-group row">  
+  <label class="col-sm-2 col-form-label">Gene:</label>  
+  <div class="col-sm-4">  
+   <input type="text" class="form-control" name="genes" id="id_genes" required maxlength="255" value="{{ allabberations.genes }}" />  
+  </div>  
+   </div>  
+  <div class="form-group row">  
+  <label class="col-sm-2 col-form-label">Variant:</label>  
+  <div class="col-sm-4">  
+   <input type="text" class="form-control" name="variants" id="id_variants" required maxlength="255" value="{{ allabberations.variants }}" />  
+  </div>  
+   </div>  
+  <div class="form-group row">  
+  <label class="col-sm-2 col-form-label">Tier:</label>  
+  <div class="col-sm-4">  
+   <input type="text" class="form-control" name="tier" id="id_tier" required maxlength="255" value="{{ allabberations.tier }}" />  
+  </div>  
+   </div>
+   <div class="form-group row">  
+    <label class="col-sm-2 col-form-label">Variant_Type:</label>  
+    <div class="col-sm-4">  
+     <input type="text" class="form-control" name="variant_type" id="id_variant_type" required maxlength="255" value="{{ allabberations.variant_type }}" />  
+    </div>  
+     </div>
+     <div class="form-group row">  
+        <label class="col-sm-2 col-form-label">Variant Allele Frequency(%):</label>  
+        <div class="col-sm-4">  
+         <input type="text" class="form-control" name="vaf" id="id_vaf" required maxlength="255" value="{{ allabberations.vaf }}" />  
+        </div>  
+         </div>
+    <div class="form-group row">  
+        <label class="col-sm-2 col-form-label">Depth:</label>  
+        <div class="col-sm-4">  
+            <input type="text" class="form-control" name="coverage" id="id_coverage" required maxlength="255" value="{{ allabberations.coverage }}" />  
+        </div>  
+    </div>
+    <div class="form-group row">  
+        <label class="col-sm-2 col-form-label">Transcript:</label>  
+        <div class="col-sm-4">  
+            <input type="text" class="form-control" name="transcript" id="id_transcript" required maxlength="255" value="{{ allabberations.transcript }}" />  
+        </div>  
+    </div>
+    <div class="form-group row">  
+        <label class="col-sm-2 col-form-label">Locus:</label>  
+        <div class="col-sm-4">  
+            <input type="text" class="form-control" name="locus" id="id_locus" required maxlength="255" value="{{ allabberations.locus }}" />  
+        </div>  
+    </div>
+    <div class="form-group row">  
+        <label class="col-sm-2 col-form-label">Exon:</label>  
+        <div class="col-sm-4">  
+            <input type="text" class="form-control" name="exon" id="id_exon" required maxlength="255" value="{{ allabberations.exon }}" />  
+        </div>  
+    </div>
+    <div class="form-group row">  
+        <label class="col-sm-2 col-form-label">Length(bp):</label>  
+        <div class="col-sm-4">  
+            <input type="text" class="form-control" name="length_bp" id="id_length_bp" required maxlength="255" value="{{ allabberations.length_bp }}" />  
+        </div>  
+    </div>
+    <div class="form-group row">  
+        <label class="col-sm-2 col-form-label">Variant(PMKB):</label>  
+        <div class="col-sm-4">  
+            <input type="text" class="form-control" name="variant_pmkb" id="id_variant_pmkb" required maxlength="255" value="{{ allabberations.variant_pmkb }}" />  
+        </div>  
+    </div>
+
+  <div class="form-group row">  
+  <label class="col-sm-1 col-form-label"></label>  
+  <div class="col-sm-4">  
+  <button type="submit" class="btn btn-success btn-lg">Update</button>  
+  </div>  
+   </div>  
+  </div>  
+ </form>  
+{% endblock content %} 

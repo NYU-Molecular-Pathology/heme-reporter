@@ -1,0 +1,128 @@
+{% load static %}
+<html>
+    <head>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--<link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">-->
+    <!--<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>--> <!--Doesnt work for tooltip, works only for edit button-->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>                                         
+    <script src ="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"><!--tooltip bootstrap for freq showing-->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> <!--tooltip bootstrap for freq showing-->          
+    
+</head>
+<body style="font-family:Arial;margin: 50px;">
+    <form action="{% url 'preview_report' %}" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+      <h4 style="background-color:#0059b3;color:White">SPECIMEN </h4>
+      <b><label for="tumorsample">Tumor sample: </label></b>
+      <select name="Sample" id="mySamples" onchange="myDropdownFunction()">
+        <option selected value="{{ sample }}">{{ sample }}</option>
+      </select><br/><br/>
+      <b><label for="specimentype"> Specimen Type: </label></b>
+      <select name="specimentype">
+        <option selected="selected" disabled>SpecimenType</option>
+        <option value="Any">Any</option>
+        {% for specimentype in specimentype %}
+        <option value="{{ specimentype }}">{{ specimentype }}</option>
+        {% endfor %}
+      </select><br/><br/>
+
+      <hr>
+      <div class="col-md-12">
+        <h4> All Abberations:</h4> <span>
+        <div class="table-responsive">
+        <table id="bootstrapdatatable" class="table table-striped table-bordered" width="100%">
+                  <thead> 
+                        <th><input type="checkbox" id="checkall" name=selected_values/></th>
+                        <th>ID</th>
+                        <th>Sample</th>
+                        <th>Gene</th>
+                        <th>Variant</th> 
+                        <th>Tier</th>
+                        <th>Variant_Type</th> 
+                        <th>Variant Allele Frequency(%)</th> 
+                        <th>Depth</th> 
+                        <th>Transcript</th>
+                        <th>Locus</th> 
+                        <th>Exon</th>
+                        <th>Length(bp)</th>
+                        <th>Variant(PMKB)</th>
+                        <th>Edit</th>
+                  </thead> 
+                  <tbody> 
+                      {% for variant in allabberations %} 
+                        <tr> 
+                          <td><input type="checkbox" id="checkall" class="checkthis" name=selected_values value={{variant.id}}/></td>
+                          <td>{{variant.id}}</td>
+                          <td>{{variant.sample}}</td>
+                          <td>{{variant.genes}}</td>
+                          <td>{{variant.variants}}
+                            <div data-toggle="tooltip" data-placement="right" data-html="true" data-title="{{variant.Freq}}">
+                              <img src="/static/images/icon5.png" alt="icon" width="20" height="20"/>
+                            </div>
+                          </td> 
+                          {% if variant.DefaultTier == "Yes" %}
+                            <td>{{variant.tier}}<br/>
+                              <img src="/static/images/tier3b2.png" alt="icon" width="20" height="20"></img></td>
+                          {% else %}
+                            <td>{{variant.tier}}</td>
+                          {% endif %}
+                          <td>{{variant.variant_type}}</td> 
+                          <td>{{variant.vaf}}</td> 
+                          <td>{{variant.coverage}}</td> 
+                          <td>{{variant.transcript}}</td> 
+                          <td>{{variant.locus}}</td>
+                          <td>{{variant.exon}}</td>
+                          <td>{{variant.length_bp}}</td>
+                          <td>{{variant.variant_pmkb}}</td>
+                          <td><p title="Edit"><a href="/edit/{{ variant.id }}" class="btn" data-title="Edit" data-target="#edit" ><span class="glyphicon glyphicon-pencil"></span></a></p></td>  
+                        </tr>  
+                      {% endfor %} 
+                  </tbody>
+        </table>
+      </form>
+        <input type="submit"
+                   value="Preview"
+                   style="border: 1px solid green; padding:5px; border-radius: 2px; cursor: pointer;">
+
+        <form method="POST" action="/index/{{runid}}"> 
+          {% csrf_token %}
+          <input type="submit" value="Home"/>
+          </form>
+      
+    </div>
+  </div>
+    <script>
+      $(document).ready(function(){
+          $('[data-toggle="tooltip"]').tooltip();   
+      });
+   </script>
+    <script>
+      function myDropdownFunction() {
+          var input, filter, table, tr, td, i;
+          input = document.getElementById("mySamples");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("bootstrapdatatable");
+          tr = table.getElementsByTagName("tr");
+          for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[2];
+            if (td) {
+              if (td.innerHTML.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+              } else {
+                tr[i].style.display = "none";
+              }
+            }       
+          }
+        }
+
+    </script>
+</body>
+    

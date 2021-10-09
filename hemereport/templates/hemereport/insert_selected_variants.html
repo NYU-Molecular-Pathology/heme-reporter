@@ -1,0 +1,238 @@
+{% load static %}
+<html>
+  <head>
+    <link href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src ="https://cdn.datatables.net/1.10.23/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.16/js/dataTables.bootstrap4.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.5/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.5/js/buttons.html5.min.js"></script>
+  
+  </head>
+  <body style="font-family:Arial;margin: 50px;"></body>
+    <div id="source-html">
+      <!-- SPECIMEN DETAILS -->
+      <h4 style="background-color:#0059b3;color:White">SPECIMEN </h4>
+      <br/>
+      <b><p id="tumorsample">Tumor sample: {{ tumor_sample }}</p></b><br/>
+      <b><label for="specimentype">Specimen Type:</b> {{ specimentype }}</label><br/>
+      <br/>
+      <b><label for="Clinical History">Clinical History:</label></b><br/>
+      <br>
+      <br>
+
+      <h4 style="background-color:#0059b3;color:White">RESULTS </h4>
+      <!-- DNA RESULTS -->
+      <br/>
+      <h4> DNA Sequencing results</h4>
+    {% if DNA_results_final %}
+        <table border="1" width="100%">
+            <thead> 
+                      <th style="text-align:center">Gene</th>
+                      <th style="text-align:center">Variant</th> 
+                      <th style="text-align:center">Tier</th>
+                      <th style="text-align:center">Variant Type</th> 
+                      <th style="text-align:center">VAF(%)</th> 
+                      <th style="text-align:center">Depth</th> 
+                      <th style="text-align:center">Transcript</th>
+              </thead> 
+              <tbody> 
+                    {% for variant in DNA_results_final %} 
+                      <tr> 
+                        <td style="text-align:center">{{variant.genes}}</td>
+                          <td style="text-align:center">{{variant.variants}}</td>
+                          <td style="text-align:center">{{variant.tier}}</td>
+                          <td style="text-align:center">{{variant.variant_type}}</td> 
+                          <td style="text-align:center">{{variant.vaf}}</td> 
+                          <td style="text-align:center">{{variant.coverage}}</td> 
+                          <td style="text-align:center">{{variant.transcript}}</td> 
+                      </tr>  
+                    {% endfor %}
+              </tbody>
+      </table>
+        {% else %}
+      <p><b>•	Coding (non-synonymous) variants </b>None.</p>
+    {% endif %}<br>
+      <br>
+
+      <!-- RNA RESULTS -->
+      <h4> Targeted RNA Sequencing results</h4>
+      {% if RNA_results_final %}
+      <table border="1" width="100%">
+        <thead> 
+              <th style="text-align:center">Gene(Exon)</th>
+              <th style="text-align:center">Tier</th>
+              <th style="text-align:center">Variant Type</th> 
+              <th style="text-align:center">Locus</th>
+        </thead> 
+        <tbody> 
+            {% for variant in RNA_results_final %} 
+              <tr> 
+                <td style="text-align:center">{{variant.genes}}</td>
+                <td style="text-align:center">{{variant.tier}}</td>
+                <td style="text-align:center">{{variant.variant_type}}</td> 
+                <td style="text-align:center">{{variant.locus}}</td>
+              </tr>  
+            {% endfor %} 
+        </tbody>
+    </table>
+    {% else %}
+    <p><b>•	The following fusions were detected in the tumor: </b>None.</p>
+    {% endif %}<br>
+      <br>
+
+
+      <div><p><b> Tier 1: </b><br/></p></div>
+        {% if DNA_Tier1_final %}
+            {% for tier1_variant in DNA_Tier1_final  %}
+            <div><p><b>Variant: </b>{{ tier1_variant.variants }}</p></div>
+            <div><p><b>Comments: </b>{{ tier1_variant.interpretations }} </p></div>
+            <div><p><b>References: </b>{{ tier1_variant.citations|linebreaks }}</p></div><br>
+            {% endfor %}
+        {% else %}
+        <div><p>None Identified</p></div><br><br>
+        {% endif %}
+
+        {% if RNA_results_final %}
+            {% for fusion in RNA_results_final  %}
+            <div><p><b>Gene Fusion: </b>{{ fusion.genes }}</p></div>
+            <div><p><b>Breakpoint: </b>{{ fusion.locus }}</p></div>
+            <div><p><b>Comments: </b>{{ fusion.interpretations }} </p></div>
+            <div><p><b>References: </b>{{ fusion.citations|linebreaks }} </p></div><br><br>
+            {% endfor %}
+        {% endif %}
+
+
+        <div><p><b> Tier 2: </b><br/></p></div>
+          {% if DNA_Tier2_final %}
+              {% for tier2_variant in DNA_Tier2_final  %}
+              <div><p><b>Variant: </b>{{ tier2_variant.variants }}</p></div>
+              <div><p><b>Comments: </b>{{ tier2_variant.interpretations }} </p></div>
+              <div><p><b>References: </b>{{ tier2_variant.citations|linebreaks }} </p></div><br><br>
+              {% endfor %}
+          {% else %}
+          <div><p>None Identified</p></div><br>
+          <br>
+          {% endif %}
+
+
+          <div><p><b> Tier 3: </b><br/></p></div>
+            {% if DNA_Tier3_final and variant_comment_tier3.empty %}
+               {% for tier3_variant in DNA_Tier3_final  %}
+               <div><p><b>Variant: </b>{{ tier3_variant.variants }}</p></div>
+               <!--<div><p><b>Comments: </b>{{ tier3_variant.interpretations }} </p></div>-->
+               <!--<div><p><b>References: </b>{{ tier3_variant.citations|linebreaks }} </p></div><br/>-->
+            {% endfor %}
+           {% elif DNA_Tier3_final and not variant_comment_tier3.empty %}
+              {% for tier3_variant in DNA_Tier3_final  %}
+              <div><p><b>Variant: </b>{{ tier3_variant.variants }}</p></div>
+              <div><p><b>Comments: </b>{{ tier3_variant.interpretations }}</p></div>
+              <div><p><b>References: </b>{{ tier3_variant.citations|linebreaks }}</p></div><br/>
+            {% endfor %}
+          {% else %}
+           <div><p>None Identified</p></div>
+           {% endif %}
+          <br/>
+          <br/>
+          <br/>
+
+           <div><p><b> Note: </b> Variants are categorized into three tiers: <br/></p></div><br>
+
+            <div><p>Tier 1 - variants with strong clinical significance.</p></div>
+            <div><p>Tier 2 - variants with potential clinical significance.</p></div>
+            <div><p>Tier 3 - variants with likely benign or unknown clinical significance.</p></div><br/>
+
+            <h4 style="background-color:#0059b3;color:White">BACKGROUND </h4>
+            <p>The NYU Oncomine Myeloid panel is a multi-biomarker NGS assay that enables the detection of variants in 50 key hematological malignancy related genes.<br/>
+            Purpose: To identify somatic mutations, and fusions in the tumor that may improve diagnosis, modify therapy or allow the patient to enter ongoing trials.  </p>
+
+            <h4 style="background-color:#0059b3;color:White">METHODS </h4>
+            <p>DNA and (or) RNA were extracted from fresh peripheral blood and/or bone marrow specimens, were tested by next generation sequencing using the NYU Oncomine Myeloid panel for specific mutations in 50 genes some of which are covered fully in the design, others in specific hotspots as follows:</p><br/>
+
+            <h5><b><u>22 hotspot genes:</u></b></h5>
+            <table border="2">
+              <tr><td>ABL1</td><td>BRAF</td><td>CBL</td><td>CSF3R</td><td>DNMT3A</td><td>FLT3</td><td>GATA2</td></tr>
+              <tr><td>HRAS</td><td>IDH1</td><td>IDH2</td><td>JAK2</td><td>KIT</td><td>KRAS</td><td>MPL</td></tr>
+              <tr><td>NPM1</td><td>NRAS</td><td>PTPN11</td><td>SETBP1</td><td>SF3B1</td><td>SRSF2</td><td>U2AF1</td></tr>
+              <tr><td>WT1</td></tr>   
+            </table><br/>
+
+            <h5><b><u>16 full genes:</u></b></h5>
+            <table border="2">
+              <tr><td>ASXL1</td><td>BCOR</td><td>CALR</td><td>CEBPA</td><td>ETV6</td><td>EZH2</td><td>NF1</td></tr>
+              <tr><td>PHF6</td><td>PRPF8</td><td>RB1</td><td>RUNX1</td><td>SH2B3</td><td>STAG2</td><td>TET2</td></tr>
+              <tr><td>TP53</td><td>ZRSR2</td></tr>   
+            </table>
+
+            <h5><b><u>17 fusion drivers:</u></b></h5>
+            <table border="2">
+              <tr><td>ABL1</td><td>BRAF</td><td>CREBBP</td><td>ETV6</td><td>FGFR1</td><td>FUS</td><td>HMGA2</td></tr>
+              <tr><td>JAK2</td><td>KMT2A</td><td>MECOM</td><td>MYH11</td><td>NTRK3</td><td>NUP214</td><td>PDGFRA</td></tr>
+              <tr><td>PDGFRB</td><td>RARA</td><td>RUNX1</td></tr>   
+            </table><br/>
+
+            <p>A detailed list of all regions covered by the test is available upon request. The specific mutations are detected by amplification of the corresponding exons by polymerase chain reaction (PCR). The PCR product is sequenced on an Ion Torrent S5 instrument. Analysis is performed using Ion Reporter Software 5.12.</p><br/>
+
+            <h5><b>References:</b></h5>
+            <p>1.Izevbaye I, Liang LY, Mather C, El-Hallani S, Maglantay R Jr, Saini L. Clinical Validation of a Myeloid Next-Generation Sequencing Panel for Single-Nucleotide Variants, Insertions/Deletions, and Fusion Genes. J Mol Diagn. 2020;22(2):208-219. doi: 10.1016/j.jmoldx.2019.10.002. Epub 2019 Nov 18. PMID: 31751678.
+            </p>
+            <p>2.Mehrotra M, Duose DY, Singh RR, Barkoh BA, Manekia J, Harmon MA, et al. (2017). Versatile ion S5XL sequencer for targeted next generation sequencing of solid tumors in a clinical laboratory. PLoS ONE 12(8): e0181968. https://doi.org/10.1371/journal.pone.0181968</p><br/>
+
+            <h4 style="background-color:#0059b3;color:White">DISCLAIMERS</h4>
+            <p>1.Next generation sequencing can identify somatic mutations and fusions present in the tumor specimen. However, a negative test does not rule out the presence of malignancy. Results of this test must always be interpreted in the context of clinical, morphologic and immunophenotypic data.</p>
+            <p>2.Diagnostic sensitivity:</p>
+            <p>&nbsp;&nbsp;&nbsp;a.This assay is designed to detect single nucleotide variants (SNV), small insertions/deletions (Indel) and gene fusions only within defined regions.</p>
+            <p>3.Analytical sensitivity:</p>
+            <p>&nbsp;&nbsp;&nbsp;a.This assay may not detect certain SNV and Indel variants if the proportion of tumor cells in the sample studied is less than 10%. The maximum Indel length detected by this assay is 79bp. The lower limit of detection (variant frequency) for SNVs, and indels is 0.05 and 0.07, respectively.</p>
+            <p>&nbsp;&nbsp;&nbsp;b.Fusions may not be detected if the proportion of tumor cells in the sample studied is less than 10%.</p>
+            <p>4.Variants may not be detected in regions with coverage less than 500X and are therefore interpreted as indeterminate. A full list of those regions is available upon request.</p>
+            <p>5.Results of this test are not sufficient for diagnosis and must always be interpreted in the context of clinical, morphologic and immunophenotypic data.</p>
+            <p>6.This test is not designed for detection of minimal residual disease.</p>
+            <p>7.This test is not designed for detection of germline mutations. Genetic counselling and testing is necessary for analysis of germline mutations that may be associated with cancer.</p>
+            <p>8.This test is not designed for detection of copy number gain or losses in tested genes.</p>
+            <p>9.This test was developed and its performance characteristics determined by the Molecular Pathology Laboratory of New York University. It has not been cleared or approved by the U.S. Food and Drug Administration. The FDA has determined that such clearance or approval is not necessary.</p><br/>
+    </div>
+    <button onclick="Export2Doc('source-html');">Export to word doc</button><br/>
+
+    <form method="POST" action="/index/{{runid}}"> 
+      {% csrf_token %}
+      <input type="submit" value="Home"/>
+      </form>
+      
+  </body>
+</html>
+<script type="text/javascript">
+  function Export2Doc(element, filename=''){
+    var html = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'></head><body>";
+    var footer = "</body></html>";
+    var html = html+document.getElementById(element).innerHTML+footer;
+
+     //link url
+    var url = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(html);
+    //filename
+    var filename_tumor = document.getElementById("tumorsample").innerHTML;
+    var result = filename_tumor.split(": ")[1];
+    var filename = result+'.doc';
+
+    // Creates the  download link element dynamically
+    var downloadLink = document.createElement("a");
+
+    document.body.appendChild(downloadLink);
+
+    //Link to the file
+    downloadLink.href = url;
+  
+    //Setting up file name
+    downloadLink.download = filename;
+  
+    //triggering the function
+    downloadLink.click();
+    //Remove the a tag after donwload starts.
+    document.body.removeChild(downloadLink);
+    
+  }
+</script>
