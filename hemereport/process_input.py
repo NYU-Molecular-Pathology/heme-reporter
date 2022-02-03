@@ -78,7 +78,7 @@ def all_results(myeloid_report,PMKB,selected_sample):
             return abberations_all
         else:
             RNA_results_processed = process_files(myeloid_report,PMKB,selected_sample,"RNA")[1]
-            RNA_results_final = RNA_results_processed[['Runid_x','Sample_x','Gene_y','Type_x','Transcript_x','Variants_y','Length_x','Frequency_x','Exon_x','AA_x','Coverage_x','tier','Locus_x','interpretations','citations','variant']]
+            RNA_results_final = RNA_results_processed[['Runid_x','Sample_x','Gene_x','Type_x','Transcript_x','Variants_y','Length_x','Frequency_x','Exon_x','AA_x','Coverage_x','tier','Locus_x','interpretations','citations','variant']]
             RNA_results_final.columns = RNA_results_final.columns.str.rstrip('_x|_y')
             RNA_results_final.rename(columns={'Gene':'genes_myeloid'}, inplace=True)
             RNA_results_final_df = RNA_results_final.sort_values('tier')
@@ -99,7 +99,7 @@ def all_results(myeloid_report,PMKB,selected_sample):
     else:
         ## If it is only FUSION for a sample, process for RNA results
         RNA_results_processed = process_files(myeloid_report,PMKB,selected_sample,"RNA")[1]
-        RNA_results_final = RNA_results_processed[['Runid_x','Sample_x','Gene_y','Type_x','Transcript_x','Variants_y','Length_x','Frequency_x','Exon_x','AA_x','Coverage_x','tier','Locus_x','interpretations','citations','variant']]
+        RNA_results_final = RNA_results_processed[['Runid_x','Sample_x','Gene_x','Type_x','Transcript_x','Variants_y','Length_x','Frequency_x','Exon_x','AA_x','Coverage_x','tier','Locus_x','interpretations','citations','variant']]
         RNA_results_final.columns = RNA_results_final.columns.str.rstrip('_x|_y')
         RNA_results_final.rename(columns={'Gene':'genes_myeloid'}, inplace=True)
         RNA_results_final_df = RNA_results_final.sort_values('tier')
@@ -107,13 +107,14 @@ def all_results(myeloid_report,PMKB,selected_sample):
         return RNA_results
 
 def main(myeloid_report,PMKB):
-    all_abberatons = pd.DataFrame()
+    all_abberations = pd.DataFrame()
     samples = myeloid_report['Sample'].unique()
     for sample in samples:
         abberation_per_sample = all_results(myeloid_report,PMKB,sample)
-        all_abberatons = all_abberatons.append(abberation_per_sample)
-    input_all_abberations = all_abberatons[['Runid','Sample','genes_myeloid','Type','Transcript','Variants','Length','Frequenc','Exon','AA','Coverage','tier','Locus','interpretations','citations','variant']]
-    input_all_abberations_tiering = input_all_abberations.copy()
+        all_abberations = all_abberations.append(abberation_per_sample)           
+    input_all_abberations = all_abberations[['Runid','Sample','genes_myeloid','Type','Transcript','Variants','Length','Frequenc','Exon','AA','Coverage','tier','Locus','interpretations','citations','variant']]
+    input_all_abberations_dropna = input_all_abberations.dropna(subset=('Variants','interpretations','citations','variant'), how='all')
+    input_all_abberations_tiering = input_all_abberations_dropna.copy()
     input_all_abberations_tiering['tier'] = input_all_abberations_tiering['tier'].fillna(0)
     input_all_abberations_final = input_all_abberations_tiering.reset_index(drop=True)
     input_all_abberations_final = input_all_abberations_final[input_all_abberations_final['genes_myeloid'].notna()]
