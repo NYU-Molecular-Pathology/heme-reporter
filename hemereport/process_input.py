@@ -91,7 +91,9 @@ def all_results(myeloid_report,PMKB,selected_sample):
         
     ## If negative cases are found return minimal info ##
     elif negative_found['Genes'].count() > 0:
-        myeloid_report_persample_final = myeloid_report_persample[['Runid','Sample','Genes','Type','Transcript','Length','Frequency','AA','Coverage']]
+        runid = myeloid_report_persample.Runid.unique()
+        myeloid_report_persample_final = pd.DataFrame(columns=['Runid','Sample','Genes','Type','Transcript','Variants','Length','Frequency','Exon','AA','Coverage','tier','Locus','interpretations','citations','variant'])
+        myeloid_report_persample_final = myeloid_report_persample_final.append({'Runid': runid[0], 'Sample': selected_sample, 'Genes': "negative",'Type' : "negative",'Transcript': "negative",'Variants': "negative",'Frequency': 0.0,'Exon':0,'AA': "negative",'Coverage': 0,'tier': 0,'Locus' : "negative",'interpretations': "negative",'citations': "negative",'variant': "negative"}, ignore_index=True)
         myeloid_report_persample_final.rename(columns={'Genes':'genes_myeloid'}, inplace=True)
         return myeloid_report_persample_final
     
