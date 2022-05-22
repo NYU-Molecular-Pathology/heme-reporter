@@ -147,36 +147,50 @@ def generate_abberations(request):
 def index(request, runid): 
     #allabberations_df = pd.DataFrame(list(AllAbberations.objects.all().values()))
     specimentype= ["peripheral blood","bone marrow aspirate","other"]
+    variant_comment = pd.DataFrame(list(VariantSpecificComment.objects.all().values()))
+    variant_comment_list = list(variant_comment.variants)
     allabberations_df = pd.DataFrame(list(AllAbberations.objects.filter(runid=runid).values()))
+    allabberations_df['DefaultTier'] = allabberations_df['variants'].apply(lambda x: 'Yes' if x in variant_comment_list else 'No')
     tiering_history = pd.DataFrame(list(VariantTiering.objects.all().values()))
     if not tiering_history.empty:
         ## Get the variant freq for the selected list from table ##
         freq_variants_values = variant_tier_freq.variant_tier_frequency(tiering_history)
         allabberations_merge = pd.merge(allabberations_df,freq_variants_values,how='left',on='variants')
-        json_records = allabberations_merge.reset_index().to_json(orient ='records') 
+        abberations_merge = allabberations_merge.drop_duplicates()
+        json_records = abberations_merge.reset_index().to_json(orient ='records') 
         allabberations = []
         allabberations = json.loads(json_records)
         samples = allabberations_df['sample'].unique()
     else:
-        allabberations = AllAbberations.objects.all()
+        allabberations = allabberations_df.drop_duplicates()
+        json_records = allabberations.reset_index().to_json(orient ='records') 
+        allabberations = []
+        allabberations = json.loads(json_records)
         samples = allabberations_df['sample'].unique()
     return render(request,"hemereport/show.html",{'allabberations':allabberations,'samples':samples,'specimentype':specimentype}) 
 
 def index_runid_sample(request, runid, sample):
     specimentype= ["peripheral blood","bone marrow aspirate","other"]
+    variant_comment = pd.DataFrame(list(VariantSpecificComment.objects.all().values()))
+    variant_comment_list = list(variant_comment.variants)
     allabberations_df = pd.DataFrame(list(AllAbberations.objects.filter(runid=runid,sample=sample).values()))
+    allabberations_df['DefaultTier'] = allabberations_df['variants'].apply(lambda x: 'Yes' if x in variant_comment_list else 'No')
     tiering_history = pd.DataFrame(list(VariantTiering.objects.all().values()))
     if not tiering_history.empty:
         ## Get the variant freq for the selected list from table ##
         freq_variants_values = variant_tier_freq.variant_tier_frequency(tiering_history)
         allabberations_merge = pd.merge(allabberations_df,freq_variants_values,how='left',on='variants')
-        json_records = allabberations_merge.reset_index().to_json(orient ='records') 
+        abberations_merge = allabberations_merge.drop_duplicates()
+        json_records = abberations_merge.reset_index().to_json(orient ='records') 
         allabberations = []
         allabberations = json.loads(json_records)
         selected_sample = sample
         runid = runid
     else:
-        allabberations = AllAbberations.objects.filter(runid=runid,sample=sample)
+        allabberations = allabberations_df.drop_duplicates()
+        json_records = allabberations.reset_index().to_json(orient ='records') 
+        allabberations = []
+        allabberations = json.loads(json_records)
         selected_sample = sample
         runid = runid
     return render(request,"hemereport/show_persample.html",{'allabberations':allabberations,'sample':selected_sample, 'runid':runid,'specimentype':specimentype}) 

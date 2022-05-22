@@ -52,7 +52,7 @@ def all_results(myeloid_report,PMKB,selected_sample):
     myeloid_report_persample = myeloid_report[(myeloid_report['Sample'] == selected_sample)]
     ## If Sample has SNV,INDEL then combine DNA+RNA 
     myeloid_report_persample_type = myeloid_report_persample.Type.unique()
-    type_status = any(x in myeloid_report_persample_type for x in ['SNV', 'INDEL'])
+    type_status = any(x in myeloid_report_persample_type for x in ['SNV', 'INDEL','MNV'])
     ## For negative cases, if Genes is "NEGATIVE" then just return Run and sample info ##
     ## Checking if Genes contians NEGATIVE ##
     negative_found = myeloid_report_persample[myeloid_report_persample['Genes'].str.contains('NEGATIVE')]
